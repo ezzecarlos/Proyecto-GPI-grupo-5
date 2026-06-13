@@ -1,0 +1,82 @@
+services:
+  auth-db:
+    image: mysql:8.0
+    container_name: auth-db-container
+    restart: always
+    environment:
+      MYSQL_DATABASE: ${AUTH_DB_NAME}
+      MYSQL_USER: ${AUTH_DB_USER}
+      MYSQL_PASSWORD: ${AUTH_DB_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${AUTH_DB_ROOT_PASSWORD}
+    ports:
+      - "3307:3306"
+    volumes:
+      - auth-db-data:/var/lib/mysql
+      - ./init_db/auth_init.sql:/docker-entrypoint-initdb.d/1_auth_init.sql:ro
+    networks:
+      - stocksmart-net
+
+  inventory-db:
+    image: mysql:8.0
+    container_name: inventory-db-container
+    restart: always
+    environment:
+      MYSQL_DATABASE: ${INVENTORY_DB_NAME}
+      MYSQL_USER: ${INVENTORY_DB_USER}
+      MYSQL_PASSWORD: ${INVENTORY_DB_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${INVENTORY_DB_ROOT_PASSWORD}
+    ports:
+      - "3308:3306"
+    volumes:
+      - inventory-db-data:/var/lib/mysql
+      - ./init_db/inventory_init.sql:/docker-entrypoint-initdb.d/1_inventory_init.sql:ro
+    networks:
+      - stocksmart-net
+
+  backend-api:
+    build: .
+    container_name: backend-api-container
+    restart: always
+    ports:
+      - "5000:5000"
+    environment:
+      - PORT=${PORT}
+      - JWT_SECRET=${JWT_SECRET}
+      - AUTH_DB_HOST=${AUTH_DB_HOST}
+      - AUTH_DB_PORT=${AUTH_DB_PORT}
+      - AUTH_DB_USER=${AUTH_DB_USER}
+      - AUTH_DB_PASSWORD=${AUTH_DB_PASSWORD}
+      - AUTH_DB_NAME=${AUTH_DB_NAME}
+      - INVENTORY_DB_HOST=${INVENTORY_DB_HOST}
+      - INVENTORY_DB_PORT=${INVENTORY_DB_PORT}
+      - INVENTORY_DB_USER=${INVENTORY_DB_USER}
+      - INVENTORY_DB_PASSWORD=${INVENTORY_DB_PASSWORD}
+      - INVENTORY_DB_NAME=${INVENTORY_DB_NAME}
+    depends_on:
+      - auth-db
+      - inventory-db
+    networks:
+      - stocksmart-net
+
+  phpmyadmin:
+    image: phpmyadmin:5.2.1
+    container_name: phpmyadmin-container
+    restart: always
+    ports:
+      - "8080:80"
+    environment:
+      PMA_HOSTS: auth-db,inventory-db
+      PMA_VERBOSES: Base de Datos de Autenticacion (auth_db),Base de Datos de Inventario (inventory_db)
+    depends_on:
+      - auth-db
+      - inventory-db
+    networks:
+      - stocksmart-net
+
+volumes:
+  auth-db-data:
+  inventory-db-data:
+
+networks:
+  stocksmart-net:
+    driver: bridge

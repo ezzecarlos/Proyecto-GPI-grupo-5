@@ -87,11 +87,11 @@ VALUES (
   1, 
   'Administrador StockSmart', 
   'admin@inventario.cl', 
-  '$2a$10$tZ2P09Sg4.q4nU30p.kU2OGJ1oX084M4eC6z08aA5uJp6QzS6G6uG', 
+  '$2a$10$DgtIRWB.eFpx42EeurzFruBrHNlAY7gIeSBWb3/WJ9hDghkd737hy', 
   'ADMIN', 
   'Activo'
 )
-ON DUPLICATE KEY UPDATE email=VALUES(email);
+ON DUPLICATE KEY UPDATE email=VALUES(email), password_hash=VALUES(password_hash);
 
 -- Asignar rol Administrador_PYME al usuario administrador inicial
 INSERT INTO usuario_roles (id_usuario, id_rol)

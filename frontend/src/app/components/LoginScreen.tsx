@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Package, AlertCircle } from "lucide-react";
+import { api } from "./ui/api";
 
 interface LoginScreenProps {
   onLogin: () => void;
@@ -11,18 +12,23 @@ export function LoginScreen({ onLogin }: LoginScreenProps) {
   const [error, setError] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(false);
     setLoading(true);
-    setTimeout(() => {
+
+    try {
+      const data = await api.post('/auth/login', { email, password });
+      localStorage.setItem('token', data.token); 
+      localStorage.setItem('role', data.user.role); 
+      localStorage.setItem('userName', data.user.name); 
+      localStorage.setItem('userId', String(data.user.id)); 
+      onLogin();
+    } catch (err) {
+      setError(true);
+    } finally {
       setLoading(false);
-      if (email === "admin@inventario.cl" && password === "admin123") {
-        onLogin();
-      } else {
-        setError(true);
-      }
-    }, 800);
+    }
   };
 
   return (
@@ -96,13 +102,6 @@ export function LoginScreen({ onLogin }: LoginScreenProps) {
           {/* Helper text */}
           <p className="text-center text-gray-400 mt-5" style={{ fontSize: "0.8rem" }}>
             Credenciales entregadas por el administrador
-          </p>
-        </div>
-
-        {/* Demo hint */}
-        <div className="mt-4 text-center">
-          <p className="text-gray-400" style={{ fontSize: "0.78rem" }}>
-            Demo: admin@inventario.cl / admin123
           </p>
         </div>
       </div>

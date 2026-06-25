@@ -5,24 +5,31 @@ import {
   BarChart2,
   LogOut,
   Package2,
+  Users,
 } from "lucide-react";
 
-type Screen = "dashboard" | "productos" | "movimientos" | "reportes" | "navmap";
+type Screen = "dashboard" | "productos" | "movimientos" | "reportes" | "navmap" | "equipo";
 
 interface SidebarProps {
   activeScreen: Screen;
   onNavigate: (screen: Screen) => void;
   onLogout: () => void;
+  userRole: string;
 }
 
-const navItems = [
-  { id: "dashboard" as Screen, label: "Dashboard", icon: LayoutDashboard },
-  { id: "productos" as Screen, label: "Productos", icon: Package },
-  { id: "movimientos" as Screen, label: "Movimientos", icon: ArrowLeftRight },
-  { id: "reportes" as Screen, label: "Reportes", icon: BarChart2 },
-];
+export function Sidebar({ activeScreen, onNavigate, onLogout, userRole }: SidebarProps) {
+  const navItems = [
+    { id: "dashboard" as Screen, label: "Dashboard", icon: LayoutDashboard },
+    { id: "productos" as Screen, label: "Productos", icon: Package },
+    { id: "movimientos" as Screen, label: "Movimientos", icon: ArrowLeftRight },
+    { id: "reportes" as Screen, label: "Reportes", icon: BarChart2 },
+  ];
 
-export function Sidebar({ activeScreen, onNavigate, onLogout }: SidebarProps) {
+  // Si es Administrador, agregamos la pestaña de administración de Equipo
+  if (userRole === "ADMINISTRADOR") {
+    navItems.push({ id: "equipo" as Screen, label: "Equipo", icon: Users });
+  }
+
   return (
     <aside className="w-60 min-h-screen bg-white border-r border-gray-100 flex flex-col shadow-sm">
       {/* Brand */}

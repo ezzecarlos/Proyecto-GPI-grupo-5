@@ -22,6 +22,7 @@ export function LoginScreen({ onLogin }: LoginScreenProps) {
       localStorage.setItem('token', data.token); 
       localStorage.setItem('role', data.user.role); 
       localStorage.setItem('userName', data.user.name); 
+      localStorage.setItem('userEmail', data.user.email); 
       localStorage.setItem('userId', String(data.user.id)); 
       onLogin();
     } catch (err) {

@@ -27,24 +27,40 @@ export default function App() {
   const [userRole, setUserRole] = useState(() => {
     return localStorage.getItem('role') || 'VENDEDOR';
   });
+  const [userName, setUserName] = useState(() => {
+    return localStorage.getItem('userName') || 'Usuario';
+  });
+  const [userEmail, setUserEmail] = useState(() => {
+    return localStorage.getItem('userEmail') || '';
+  });
   const [activeScreen, setActiveScreen] = useState<Screen>("dashboard");
 
   const handleLogin = () => {
     setIsLoggedIn(true);
     setUserRole(localStorage.getItem('role') || 'VENDEDOR');
+    setUserName(localStorage.getItem('userName') || 'Usuario');
+    setUserEmail(localStorage.getItem('userEmail') || '');
   };
 
   const handleLogout = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('role');
     localStorage.removeItem('userName');
+    localStorage.removeItem('userEmail');
     localStorage.removeItem('userId');
     setIsLoggedIn(false);
     setUserRole('VENDEDOR');
+    setUserName('Usuario');
+    setUserEmail('');
     setActiveScreen("dashboard");
   };
 
   const handleNavigate = (screen: Screen) => setActiveScreen(screen);
+
+  const handleProfileUpdate = (newName: string) => {
+    localStorage.setItem('userName', newName);
+    setUserName(newName);
+  };
 
   if (!isLoggedIn) {
     return <LoginScreen onLogin={handleLogin} />;
@@ -59,7 +75,15 @@ export default function App() {
         userRole={userRole}
       />
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
-        <TopBar title={screenTitles[activeScreen]} />
+        <TopBar
+          title={screenTitles[activeScreen]}
+          userName={userName}
+          userEmail={userEmail}
+          userRole={userRole}
+          onNavigate={handleNavigate}
+          onLogout={handleLogout}
+          onProfileUpdate={handleProfileUpdate}
+        />
         <main className="flex-1 overflow-y-auto">
           {activeScreen === "dashboard" && (
             <DashboardScreen onNavigate={handleNavigate} userRole={userRole} />
